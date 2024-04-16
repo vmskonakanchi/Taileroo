@@ -1,14 +1,81 @@
-import {StyleSheet, Text, View} from 'react-native';
-import React from 'react';
+import * as React from 'react';
+import {StyleSheet, TextInput, View} from 'react-native';
+import {Colors} from '../constants';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const Input = () => {
+type InputProps = {
+  placeholder: string;
+  isPassword?: boolean;
+  value?: string;
+  onChange?: (text: string) => void;
+  keyBoardType?:
+    | 'default'
+    | 'number-pad'
+    | 'decimal-pad'
+    | 'numeric'
+    | 'email-address'
+    | 'phone-pad';
+};
+
+const Input = (props: InputProps) => {
+  const {placeholder, isPassword, onChange, keyBoardType, value} = props;
+  const [checked, setCheked] = React.useState(false);
+  const handleCheck = () => setCheked(!checked);
+
+  if (isPassword) {
+    return (
+      <View style={styles.container}>
+        <TextInput
+          style={styles.input}
+          placeholder={placeholder}
+          secureTextEntry={isPassword && !checked}
+          onChangeText={onChange}
+          value={value}
+          keyboardType={keyBoardType}
+          placeholderTextColor={Colors.Black}
+        />
+        <Icon
+          name={checked ? 'eye-off' : 'eye'}
+          color={Colors.Primary}
+          size={30}
+          onPress={handleCheck}
+          style={styles.icon}
+        />
+      </View>
+    );
+  }
+
   return (
-    <View>
-      <Text>Input</Text>
-    </View>
+    <TextInput
+      style={styles.input}
+      placeholder={placeholder}
+      keyboardType={keyBoardType}
+      onChangeText={onChange}
+      value={value}
+      placeholderTextColor={Colors.Black}
+    />
   );
 };
 
 export default Input;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    width: '100%',
+  },
+  icon: {
+    position: 'absolute',
+    right: '5%',
+    top: '25%',
+  },
+  input: {
+    padding: '5%',
+    backgroundColor: Colors.White,
+    color: Colors.Black,
+    borderColor: Colors.Primary,
+    borderWidth: 1,
+    borderRadius: 10,
+    width: '100%',
+    fontSize: 15,
+  },
+});
