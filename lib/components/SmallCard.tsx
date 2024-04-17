@@ -1,41 +1,35 @@
-import {
-  Dimensions,
-  StyleSheet,
-  Text,
-  TouchableHighlight,
-  View,
-} from 'react-native';
+import {Dimensions, StyleSheet, Text, TouchableHighlight} from 'react-native';
 import React from 'react';
 import {Colors} from '../constants';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
-type SelectCardProps = {
-  title?: string;
+type SmallCardProps = {
+  title: string;
   onPress?: () => void;
   key?: string | number;
   height?: number | string;
   width?: number | string;
 };
 
-const SelectCard = (props: SelectCardProps) => {
+const SmallCard = (props: SmallCardProps) => {
   const {title, onPress} = props;
   return (
     <TouchableHighlight
       style={styles.container}
       onPress={onPress}
       underlayColor={Colors.White}>
-      <Text style={styles.text}>{title || 'Title'}</Text>
+      <Text style={styles.text}>{title}</Text>
     </TouchableHighlight>
   );
 };
 
-export default SelectCard;
+export default SmallCard;
 
 const styles = StyleSheet.create({
   container: {
-    height: SCREEN_HEIGHT * 0.3,
-    width: SCREEN_WIDTH * 0.6,
+    height: SCREEN_HEIGHT * 0.1,
+    width: SCREEN_WIDTH * 0.2,
     backgroundColor: Colors.Primary,
     justifyContent: 'center',
     alignItems: 'center',

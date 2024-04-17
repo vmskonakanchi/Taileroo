@@ -5,15 +5,16 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from 'react-native';
-import React from 'react';
-import SelectCard from '../lib/components/SelectCard';
+import React, {useRef} from 'react';
 import {Colors, ScreenNames} from '../lib/constants';
 import Input from '../lib/components/Input';
 import Button from '../lib/components/Button';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Geolocation from 'react-native-geolocation-service';
+import axios from 'axios';
 
 type RegisterProps = {
   navigation: any;
@@ -28,6 +29,8 @@ const Register = ({navigation, route}: RegisterProps) => {
     email: '',
     address: '',
     password: '',
+    lat: 0,
+    lng: 0,
   });
   const [locationFetching, setLocationFetching] = React.useState(true);
 
@@ -40,7 +43,13 @@ const Register = ({navigation, route}: RegisterProps) => {
   };
 
   const handleRegister = () => {
-    navigation.navigate(ScreenNames.CustomerNav);
+    navigation.navigate(ScreenNames.CustomerNav, {
+      screen: ScreenNames.CustomerHome,
+      params: {
+        lat: details.lat,
+        lng: details.lng,
+      },
+    });
   };
 
   const fetchLocation = async () => {
@@ -60,15 +69,29 @@ const Register = ({navigation, route}: RegisterProps) => {
       return;
     }
     setLocationFetching(true);
-    // get address here
     Geolocation.getCurrentPosition(
-      position => {
-        console.log(position.coords.latitude, position.coords.longitude);
+      async position => {
+        const {latitude, longitude} = position.coords;
         setDetails({
           ...details,
-          address: `${position.coords.latitude}, ${position.coords.longitude}`,
+          lat: latitude,
+          lng: longitude,
         });
-        // send an api request to get the address to the google api
+
+        // sending an api request to get the address to the google api and get the address
+        // const response = await axios.get(
+        //   'https://maps.googleapis.com/maps/api/geocode/json',
+        //   {
+        //     params: {
+        //       latlng: `${latitude},${longitude}`,
+        //       key: 'AIzaSyCUA3uUquQ88On7YaIFbBpByARvNj64GAU',
+        //     },
+        //   },
+        // );
+
+        // const address = response.data.results[0].formatted_address;
+        const address = 'Test Address, Test City, Test State, Test Country';
+        setDetails({...details, address});
         setLocationFetching(false);
       },
       error => {
@@ -107,10 +130,11 @@ const Register = ({navigation, route}: RegisterProps) => {
           keyBoardType="email-address"
         />
         {locationFetching ? (
-          <ActivityIndicator size={50} />
+          <Text style={styles.loader}>Fetching Your Address...</Text>
         ) : (
           <Input
             placeholder="Enter Location"
+            isMultiLine
             value={details.address}
             onChange={text => handleChange('address', text)}
           />
@@ -140,5 +164,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: '100%',
     gap: 20,
+  },
+  loader: {
+    fontSize: 15,
+    color: Colors.Black,
   },
 });

@@ -8,6 +8,7 @@ type InputProps = {
   isPassword?: boolean;
   value?: string;
   onChange?: (text: string) => void;
+  isMultiLine?: boolean;
   keyBoardType?:
     | 'default'
     | 'number-pad'
@@ -17,8 +18,14 @@ type InputProps = {
     | 'phone-pad';
 };
 
-const Input = (props: InputProps) => {
-  const {placeholder, isPassword, onChange, keyBoardType, value} = props;
+type InputRefProps = {
+  focus: () => void;
+  setNativeProps: (props: any) => void;
+};
+
+const Input = React.forwardRef<InputRefProps, InputProps>((props, ref) => {
+  const {placeholder, isPassword, onChange, keyBoardType, value, isMultiLine} =
+    props;
   const [checked, setCheked] = React.useState(false);
   const handleCheck = () => setCheked(!checked);
 
@@ -50,12 +57,13 @@ const Input = (props: InputProps) => {
       style={styles.input}
       placeholder={placeholder}
       keyboardType={keyBoardType}
+      multiline={isMultiLine}
       onChangeText={onChange}
       value={value}
       placeholderTextColor={Colors.Black}
     />
   );
-};
+});
 
 export default Input;
 

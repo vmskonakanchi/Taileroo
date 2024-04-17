@@ -11,7 +11,10 @@ const Button = (props: InputProps) => {
   const {title, onPress} = props;
 
   return (
-    <TouchableHighlight style={styles.button} onPress={onPress}>
+    <TouchableHighlight
+      style={styles.button}
+      onPress={onPress}
+      underlayColor={Colors.White}>
       <Text style={styles.text}>{title || 'Click Me'}</Text>
     </TouchableHighlight>
   );
