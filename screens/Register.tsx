@@ -2,6 +2,7 @@ import {
   ActivityIndicator,
   Alert,
   PermissionsAndroid,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -53,19 +54,30 @@ const Register = ({navigation, route}: RegisterProps) => {
   };
 
   const fetchLocation = async () => {
-    const permissionsToAsk =
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION;
+    let isPermssionGranted = false;
+    if (Platform.OS === 'ios') {
+      const locationResponse = await Geolocation.requestAuthorization(
+        'whenInUse',
+      );
+      isPermssionGranted = locationResponse === 'granted';
+    } else if (Platform.OS === 'android') {
+      const permissionsToAsk =
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION;
 
-    const granted = await PermissionsAndroid.request(permissionsToAsk, {
-      title: 'Location Permission',
-      message: 'We need your location to fill the address automatically.',
-      buttonNeutral: 'Ask Me Later',
-      buttonNegative: 'Cancel',
-      buttonPositive: 'OK',
-    });
-
-    if (granted === PermissionsAndroid.RESULTS.DENIED) {
-      Alert.alert('Permission Denied', 'Please fill the address manually.');
+      const granted = await PermissionsAndroid.request(permissionsToAsk, {
+        title: 'Location Permission',
+        message: 'We need your location to fill the address automatically.',
+        buttonNeutral: 'Ask Me Later',
+        buttonNegative: 'Cancel',
+        buttonPositive: 'OK',
+      });
+      isPermssionGranted = granted === PermissionsAndroid.RESULTS.GRANTED;
+    }
+    if (!isPermssionGranted) {
+      Alert.alert(
+        'Permission Denied',
+        'Please enable location permission to continue',
+      );
       return;
     }
     setLocationFetching(true);
