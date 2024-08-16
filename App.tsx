@@ -1,12 +1,15 @@
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import RootNavigator from './navigations/RootNavigator';
+import AuthContext from './lib/context/userContext';
 
 function App() {
   return (
-    <NavigationContainer>
-      <RootNavigator />
-    </NavigationContainer>
+    <AuthContext>
+      <NavigationContainer>
+        <RootNavigator />
+      </NavigationContainer>
+    </AuthContext>
   );
 }
 

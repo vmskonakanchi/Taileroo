@@ -8,11 +8,6 @@ import {
 } from '../../lib/utils';
 import SmallCard from '../../lib/components/SmallCard';
 
-type CustomerHomeProps = {
-  navigation: any;
-  route: {params: {lat: number; lng: number}};
-};
-
 type Region = {
   latitude: number;
   longitude: number;
@@ -50,9 +45,9 @@ const nearByTailors = [
 
 const radiuses = [5, 10, 15, 20];
 
-const CustomerHome = ({navigation, route}: CustomerHomeProps) => {
+const CustomerHome = ({navigation, route}: any) => {
   const {lat, lng} = route.params;
-  const [region, setRegion] = useState<NearByTailor>({
+  const [region, setRegion] = useState({
     latitude: 13.624383,
     longitude: 79.4077179,
     latitudeDelta: 0.0922,

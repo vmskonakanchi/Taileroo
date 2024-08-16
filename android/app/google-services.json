@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "248758004114",
+    "project_id": "taileroo",
+    "storage_bucket": "taileroo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:248758004114:android:3dc82c47952cf0b60d394b",
+        "android_client_info": {
+          "package_name": "com.taileroo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFUP-_rEuTdHx7ciqwK-Ur7TgfNPpakgg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

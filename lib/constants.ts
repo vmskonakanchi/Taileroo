@@ -6,6 +6,10 @@ export const ScreenNames = {
   CustomerNav: 'CustomerNav',
 };
 
+export const CollectionNames = {
+  Users: 'users',
+};
+
 // combination - 1
 // export const Colors = {
 //   Primary: '#556B2F',

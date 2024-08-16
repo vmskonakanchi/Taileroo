@@ -4,7 +4,7 @@ import {Colors} from '../constants';
 
 type InputProps = {
   title?: string;
-  onPress?: () => void;
+  onPress?: any; // this will be callback function
 };
 
 const Button = (props: InputProps) => {

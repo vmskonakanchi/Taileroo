@@ -1,10 +1,12 @@
 import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import SelectCard from '../lib/components/SelectCard';
-import {Colors, ScreenNames} from '../lib/constants';
+import {CollectionNames, Colors, ScreenNames} from '../lib/constants';
 import Input from '../lib/components/Input';
 import Button from '../lib/components/Button';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 type LoginProps = {
   navigation: any;
@@ -22,11 +24,48 @@ const Login = ({navigation, route}: LoginProps) => {
     setDetails({...details, [key]: value});
   };
 
-  const handleLogin = () => {
-    // if (details.username && details.password) {
-    //   navigation.navigate(ScreenNames.Home, {userType});
-    // }
-    console.log('details', details);
+  const handleLogin = async () => {
+    try {
+      const result = await auth().signInWithEmailAndPassword(
+        details.email,
+        details.password,
+      );
+
+      const {user} = result;
+
+      const userDoc = await firestore()
+        .collection(CollectionNames.Users)
+        .doc(user?.uid)
+        .get();
+
+      if (userDoc.exists) {
+        // we found the user in the database , check for the role of user , he is customer or tailor
+        const userData = userDoc.data();
+
+        if (userData?.role !== userType) {
+          console.log('User is not a', userType);
+          return;
+        }
+
+        navigation.navigate(ScreenNames.Home, {userType});
+      } else {
+        console.log('User not found in the database');
+      }
+    } catch (error: any) {
+      if (error.code === 'auth/user-not-found') {
+        console.log('User not found');
+      } else if (error.code === 'auth/wrong-password') {
+        console.log('Wrong password');
+      } else if (error.code === 'auth/invalid-email') {
+        console.log('Invalid email');
+      } else if (error.code === 'auth/too-many-requests') {
+        console.log('Too many requests');
+      } else if (error.code === 'auth/network-request-failed') {
+        console.log('Network request failed');
+      } else {
+        console.log('Error:', error);
+      }
+    }
   };
 
   const handleRegister = () => {
