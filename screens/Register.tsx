@@ -1,20 +1,20 @@
 import {
-  ActivityIndicator,
   Alert,
   PermissionsAndroid,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Colors, ScreenNames} from '../lib/constants';
 import Input from '../lib/components/Input';
 import Button from '../lib/components/Button';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Geolocation from 'react-native-geolocation-service';
+import axios from 'axios';
+import messaging from '@react-native-firebase/messaging';
 
 type RegisterProps = {
   navigation: any;
@@ -23,7 +23,7 @@ type RegisterProps = {
 
 const Register = ({navigation, route}: RegisterProps) => {
   const {userType} = route.params as {userType: 'Customer' | 'Tailor'};
-  const [details, setDetails] = React.useState({
+  const [details, setDetails] = useState({
     name: '',
     phone: '',
     email: '',
@@ -32,7 +32,7 @@ const Register = ({navigation, route}: RegisterProps) => {
     lat: 0,
     lng: 0,
   });
-  const [locationFetching, setLocationFetching] = React.useState(true);
+  const [locationFetching, setLocationFetching] = useState(true);
 
   const handleChange = (key: string, value: string) => {
     setDetails({...details, [key]: value});
@@ -42,7 +42,25 @@ const Register = ({navigation, route}: RegisterProps) => {
     navigation.navigate(ScreenNames.Login, {userType});
   };
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
+    // ask for notification permissions for both IOS and Android
+    const authorizationStatus = await messaging().requestPermission({
+      sound: true,
+      announcement: true,
+      alert: true,
+      provisional: true,
+    });
+
+    if (authorizationStatus === messaging.AuthorizationStatus.AUTHORIZED) {
+      console.log('Permission granted');
+    } else if (
+      authorizationStatus === messaging.AuthorizationStatus.PROVISIONAL
+    ) {
+      console.log('Permission Provisional');
+    } else {
+      console.log('Permission Denied');
+    }
+
     navigation.navigate(ScreenNames.CustomerNav, {
       screen: ScreenNames.CustomerHome,
       params: {
@@ -118,7 +136,7 @@ const Register = ({navigation, route}: RegisterProps) => {
     );
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetchLocation();
   }, []);
 
@@ -129,16 +147,19 @@ const Register = ({navigation, route}: RegisterProps) => {
         <Input
           placeholder="Enter Name"
           onChange={text => handleChange('name', text)}
+          isError={details.name.length < 3}
         />
         <Input
           placeholder="Enter Phone"
-          onChange={text => handleChange('name', text)}
+          onChange={text => handleChange('phone', text)}
           keyBoardType="phone-pad"
+          isError={details.phone.length !== 10}
         />
         <Input
           placeholder="Enter Email"
           onChange={text => handleChange('email', text)}
           keyBoardType="email-address"
+          isError={!details.email.includes('@')}
         />
         {locationFetching ? (
           <Text style={styles.loader}>Fetching Your Address...</Text>
@@ -154,6 +175,7 @@ const Register = ({navigation, route}: RegisterProps) => {
           placeholder="Enter Password.. "
           isPassword
           onChange={text => handleChange('password', text)}
+          isError={details.password.length < 6}
         />
         <Button title="Register" icon="account-plus" onPress={handleRegister} />
         <Button
