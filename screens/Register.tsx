@@ -9,13 +9,12 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import React, {useRef} from 'react';
+import React from 'react';
 import {Colors, ScreenNames} from '../lib/constants';
 import Input from '../lib/components/Input';
 import Button from '../lib/components/Button';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Geolocation from 'react-native-geolocation-service';
-import axios from 'axios';
 
 type RegisterProps = {
   navigation: any;
@@ -156,8 +155,13 @@ const Register = ({navigation, route}: RegisterProps) => {
           isPassword
           onChange={text => handleChange('password', text)}
         />
-        <Button title="Register" onPress={handleRegister} />
-        <Button title="Go Back" onPress={handleLogin} />
+        <Button title="Register" icon="account-plus" onPress={handleRegister} />
+        <Button
+          title="Go Back"
+          icon="arrow-left"
+          reverse
+          onPress={handleLogin}
+        />
       </View>
     </ScrollView>
   );

@@ -12,7 +12,12 @@
           "package_name": "com.taileroo"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "248758004114-dl8grcraq80aaqpoivfl11u2m0tv1569.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCFUP-_rEuTdHx7ciqwK-Ur7TgfNPpakgg"
@@ -20,7 +25,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "248758004114-dl8grcraq80aaqpoivfl11u2m0tv1569.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

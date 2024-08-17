@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View} from 'react-native';
+import {Platform, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import SelectCard from '../lib/components/SelectCard';
 import {CollectionNames, Colors, ScreenNames} from '../lib/constants';
@@ -6,6 +6,7 @@ import Input from '../lib/components/Input';
 import Button from '../lib/components/Button';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import auth from '@react-native-firebase/auth';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import firestore from '@react-native-firebase/firestore';
 
 type LoginProps = {
@@ -26,11 +27,29 @@ const Login = ({navigation, route}: LoginProps) => {
 
   const handleLoginWithOAuth = async (provider: 'google' | 'apple') => {
     try {
-      const result = await auth().signInWithPopup(
-        provider === 'google'
-          ? new auth.OAuthProvider('google.com')
-          : new auth.OAuthProvider('apple.com'),
-      );
+      let result = null;
+      if (provider === 'google') {
+        await GoogleSignin.hasPlayServices({
+          showPlayServicesUpdateDialog: true,
+        });
+        const {idToken} = await GoogleSignin.signIn();
+
+        // Create a Google credential with the token
+        const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+
+        result = await auth().signInWithCredential(googleCredential);
+        // Sign-in the user with the credential
+      } else if (provider === 'apple') {
+        result = await auth().signInWithProvider(
+          new auth.OAuthProvider('apple.com'),
+        );
+      }
+
+      if (!result) {
+        console.log('Result is null');
+        return;
+      }
+
       if (result.user) {
         const {user} = result;
 
@@ -60,6 +79,16 @@ const Login = ({navigation, route}: LoginProps) => {
 
   const handleLogin = async () => {
     try {
+      if (!details.email.includes('@')) {
+        console.log('Invalid email');
+        return;
+      }
+
+      if (details.password.length < 6) {
+        console.log('Password must be atleast 6 characters long');
+        return;
+      }
+
       const result = await auth().signInWithEmailAndPassword(
         details.email,
         details.password,
@@ -114,22 +143,30 @@ const Login = ({navigation, route}: LoginProps) => {
           placeholder="Enter Email"
           onChange={text => handleChange('email', text)}
           keyBoardType="email-address"
+          isError={details.email.length > 0 && !details.email.includes('@')}
         />
         <Input
           placeholder="Enter Password.. "
           isPassword
           onChange={text => handleChange('password', text)}
+          isError={details.password.length > 0 && details.password.length < 6}
         />
-        <Button title="Login" onPress={handleLogin} />
-        <Button
-          title="Login With Google"
-          onPress={(_: any) => handleLoginWithOAuth('google')}
-        />
-        <Button
-          title="Login With Twitter"
-          onPress={(_: any) => handleLoginWithOAuth('apple')}
-        />
-        <Button title="Register" onPress={handleRegister} />
+        <Button title="Login" icon="login" onPress={handleLogin} />
+        {Platform.OS === 'android' && (
+          <Button
+            title="Login With Google"
+            icon="google"
+            onPress={(_: any) => handleLoginWithOAuth('google')}
+          />
+        )}
+        {Platform.OS === 'ios' && (
+          <Button
+            title="Login With Apple"
+            icon="apple"
+            onPress={(_: any) => handleLoginWithOAuth('apple')}
+          />
+        )}
+        <Button title="Register" icon="account-plus" onPress={handleRegister} />
       </View>
     </View>
   );

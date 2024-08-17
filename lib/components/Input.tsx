@@ -16,6 +16,7 @@ type InputProps = {
     | 'numeric'
     | 'email-address'
     | 'phone-pad';
+  isError?: boolean;
 };
 
 type InputRefProps = {
@@ -24,8 +25,15 @@ type InputRefProps = {
 };
 
 const Input = React.forwardRef<InputRefProps, InputProps>((props, ref) => {
-  const {placeholder, isPassword, onChange, keyBoardType, value, isMultiLine} =
-    props;
+  const {
+    placeholder,
+    isPassword,
+    onChange,
+    keyBoardType,
+    value,
+    isMultiLine,
+    isError,
+  } = props;
   const [checked, setCheked] = React.useState(false);
   const handleCheck = () => setCheked(!checked);
 
@@ -33,7 +41,10 @@ const Input = React.forwardRef<InputRefProps, InputProps>((props, ref) => {
     return (
       <View style={styles.container}>
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            {borderColor: isError ? Colors.Error : Colors.Primary},
+          ]}
           placeholder={placeholder}
           secureTextEntry={isPassword && !checked}
           onChangeText={onChange}
@@ -54,7 +65,10 @@ const Input = React.forwardRef<InputRefProps, InputProps>((props, ref) => {
 
   return (
     <TextInput
-      style={styles.input}
+      style={[
+        styles.input,
+        {borderColor: isError ? Colors.Error : Colors.Primary},
+      ]}
       placeholder={placeholder}
       keyboardType={keyBoardType}
       multiline={isMultiLine}

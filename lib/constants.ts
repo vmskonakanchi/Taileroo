@@ -51,4 +51,5 @@ export const Colors = {
   Secondary: '#EDF1D6',
   White: '#FFFFFF',
   Black: '#000000',
+  Error: '#FF0000',
 };
