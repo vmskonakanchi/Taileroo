@@ -24,6 +24,40 @@ const Login = ({navigation, route}: LoginProps) => {
     setDetails({...details, [key]: value});
   };
 
+  const handleLoginWithOAuth = async (provider: 'google' | 'apple') => {
+    try {
+      const result = await auth().signInWithPopup(
+        provider === 'google'
+          ? new auth.OAuthProvider('google.com')
+          : new auth.OAuthProvider('apple.com'),
+      );
+      if (result.user) {
+        const {user} = result;
+
+        const userDoc = await firestore()
+          .collection(CollectionNames.Users)
+          .doc(user?.uid)
+          .get();
+
+        if (userDoc.exists) {
+          // we found the user in the database , check for the role of user , he is customer or tailor
+          const userData = userDoc.data();
+
+          if (userData?.role !== userType) {
+            console.log('User is not a', userType);
+            return;
+          }
+
+          navigation.navigate(ScreenNames.Home, {userType});
+        } else {
+          console.log('User not found in the database');
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
   const handleLogin = async () => {
     try {
       const result = await auth().signInWithEmailAndPassword(
@@ -87,6 +121,14 @@ const Login = ({navigation, route}: LoginProps) => {
           onChange={text => handleChange('password', text)}
         />
         <Button title="Login" onPress={handleLogin} />
+        <Button
+          title="Login With Google"
+          onPress={(_: any) => handleLoginWithOAuth('google')}
+        />
+        <Button
+          title="Login With Twitter"
+          onPress={(_: any) => handleLoginWithOAuth('apple')}
+        />
         <Button title="Register" onPress={handleRegister} />
       </View>
     </View>
