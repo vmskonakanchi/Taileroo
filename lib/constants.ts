@@ -10,6 +10,9 @@ export const CollectionNames = {
   Users: 'users',
 };
 
+export const webClientId =
+  '248758004114-dl8grcraq80aaqpoivfl11u2m0tv1569.apps.googleusercontent.com';
+
 // combination - 1
 // export const Colors = {
 //   Primary: '#556B2F',
@@ -19,7 +22,7 @@ export const CollectionNames = {
 //   Error: '#FF0000',
 // };
 
-// combination - 3
+// combination - 2
 // export const Colors = {
 //   Primary: '#FF2E63',
 //   Secondary: '#EAEAEA',
@@ -28,7 +31,7 @@ export const CollectionNames = {
 //   Error: '#FF0000',
 // };
 
-// combination - 4
+// combination - 3
 // export const Colors = {
 //   Primary: '#424874',
 //   Secondary: '#F4EEFF',
@@ -37,7 +40,7 @@ export const CollectionNames = {
 //   Error: '#FF0000',
 // };
 
-// combination - 5
+// combination - 4
 // export const Colors = {
 //   Primary: '#798777',
 //   Secondary: '#F8EDE3',
@@ -46,7 +49,7 @@ export const CollectionNames = {
 //   Error: '#FF0000',
 // };
 
-// combination - 6
+// combination - 5
 // export const Colors = {
 //   Primary: '#40514E',
 //   Secondary: '#E4F9F5',
@@ -55,7 +58,7 @@ export const CollectionNames = {
 //   Error: '#FF0000',
 // };
 
-// combination - 7
+// combination - 6
 export const Colors = {
   Primary: '#40513B',
   Secondary: '#EDF1D6',

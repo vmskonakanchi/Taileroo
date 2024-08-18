@@ -8,6 +8,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import auth from '@react-native-firebase/auth';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import firestore from '@react-native-firebase/firestore';
+import Loader from '../lib/components/Loader';
 
 type LoginProps = {
   navigation: any;
@@ -20,6 +21,7 @@ const Login = ({navigation, route}: LoginProps) => {
     email: '',
     password: '',
   });
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const handleChange = (key: string, value: string) => {
     setDetails({...details, [key]: value});
@@ -69,7 +71,18 @@ const Login = ({navigation, route}: LoginProps) => {
 
           navigation.navigate(ScreenNames.Home, {userType});
         } else {
-          console.log('User not found in the database');
+          // we do not have a user , so we need to create a user
+          const newUser = {
+            email: user?.email,
+            role: userType,
+          };
+
+          await firestore()
+            .collection(CollectionNames.Users)
+            .doc(user?.uid)
+            .set(newUser);
+
+          navigation.navigate(ScreenNames.CustomerNav, {userType});
         }
       }
     } catch (error) {
@@ -79,6 +92,8 @@ const Login = ({navigation, route}: LoginProps) => {
 
   const handleLogin = async () => {
     try {
+      setIsLoading(true);
+
       if (!details.email.includes('@')) {
         console.log('Invalid email');
         return;
@@ -135,6 +150,10 @@ const Login = ({navigation, route}: LoginProps) => {
     navigation.navigate(ScreenNames.Register, {userType});
   };
 
+  if (isLoading) {
+    return <Loader />;
+  }
+
   return (
     <View style={styles.mainContainer}>
       <View style={styles.container}>
@@ -154,14 +173,14 @@ const Login = ({navigation, route}: LoginProps) => {
         <Button title="Login" icon="login" onPress={handleLogin} />
         {Platform.OS === 'android' && (
           <Button
-            title="Login With Google"
+            title="Continue With Google"
             icon="google"
             onPress={(_: any) => handleLoginWithOAuth('google')}
           />
         )}
         {Platform.OS === 'ios' && (
           <Button
-            title="Login With Apple"
+            title="Continue With Apple"
             icon="apple"
             onPress={(_: any) => handleLoginWithOAuth('apple')}
           />

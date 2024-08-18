@@ -3,10 +3,10 @@ import {NavigationContainer} from '@react-navigation/native';
 import RootNavigator from './navigations/RootNavigator';
 import AuthContext from './lib/context/userContext';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import {webClientId} from './lib/constants';
 
 GoogleSignin.configure({
-  webClientId:
-    '248758004114-dl8grcraq80aaqpoivfl11u2m0tv1569.apps.googleusercontent.com',
+  webClientId,
 });
 
 function App() {
