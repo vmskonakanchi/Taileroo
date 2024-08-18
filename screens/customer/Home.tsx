@@ -1,12 +1,15 @@
 import {Dimensions, ScrollView, StyleSheet, Text, View} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import {Colors} from '../../lib/constants';
+import React, {useContext, useEffect, useState} from 'react';
+import {CollectionNames, Colors} from '../../lib/constants';
 import MapView, {Marker} from 'react-native-maps';
 import {
   calculateRegion,
   randomizeCoordinatesWithinRadius,
 } from '../../lib/utils';
 import SmallCard from '../../lib/components/SmallCard';
+import {userContext} from '../../lib/context/userContext';
+import firestore from '@react-native-firebase/firestore';
+import Loader from '../../lib/components/Loader';
 
 type Region = {
   latitude: number;
@@ -45,8 +48,11 @@ const nearByTailors = [
 
 const radiuses = [5, 10, 15, 20];
 
-const CustomerHome = ({navigation, route}: any) => {
-  const {lat, lng} = route.params;
+const CustomerHome = ({navigation}: any) => {
+  const {user} = useContext(userContext);
+  const {currentLocation} = user;
+  const [isLoading, setIsLoading] = useState(false);
+
   const [region, setRegion] = useState({
     latitude: 13.624383,
     longitude: 79.4077179,
@@ -55,25 +61,41 @@ const CustomerHome = ({navigation, route}: any) => {
   });
   const [radius, setRadius] = useState(radiuses[0]);
 
-  const handleRadiusChange = (radius: number) => {
-    nearByTailors.map(tailor => {
-      const {lat: tLat, lng: tLng} = randomizeCoordinatesWithinRadius(
-        lat,
-        lng,
-        radius,
-      );
-      tailor.lat = tLat;
-      tailor.lng = tLng;
-    });
+  const calcuateNearByTailors = async () => {
+    try {
+      const tailors = await firestore().collection(CollectionNames.Users).get();
+
+      const tailorsData = tailors.docs
+        .map(doc => doc.data())
+        .map(data => data.currentLocation);
+
+      return tailorsData;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
   };
 
   useEffect(() => {
-    handleRadiusChange(radius);
-  }, []);
+    setIsLoading(true);
+    calcuateNearByTailors().then(nearByTailors => {
+      if (nearByTailors) {
+        setRegion(calculateRegion(nearByTailors, radius));
+        randomizeCoordinatesWithinRadius(
+          currentLocation.latitude,
+          currentLocation.longitude,
+          radius,
+        );
+        setIsLoading(false);
+      }
+    });
+  }, [radius]);
 
-  // useEffect(() => {
-  //   setRegion(calculateRegion(nearByTailors, radius));
-  // }, [radius]);
+  if (isLoading) {
+    return (
+      <Loader message="Please wait while we get the best talors near you" />
+    );
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>

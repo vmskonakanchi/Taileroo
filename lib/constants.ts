@@ -4,10 +4,17 @@ export const ScreenNames = {
   Register: 'Register',
   CustomerHome: 'CustomerHome',
   CustomerNav: 'CustomerNav',
+  TailorNav: 'TailorNav',
+  TailorHome: 'TailorHome',
 };
 
 export const CollectionNames = {
   Users: 'users',
+};
+
+export const Roles = {
+  Customer: 'customer',
+  Tailor: 'tailor',
 };
 
 export const webClientId =

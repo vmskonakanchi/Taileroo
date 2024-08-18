@@ -1,39 +1,59 @@
-import {Platform, StyleSheet, Text, View} from 'react-native';
-import React from 'react';
-import SelectCard from '../lib/components/SelectCard';
+import {
+  Alert,
+  PermissionsAndroid,
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import {CollectionNames, Colors, ScreenNames} from '../lib/constants';
-import Input from '../lib/components/Input';
 import Button from '../lib/components/Button';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import auth from '@react-native-firebase/auth';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import firestore from '@react-native-firebase/firestore';
 import Loader from '../lib/components/Loader';
+import {userContext} from '../lib/context/userContext';
+import Geolocation from 'react-native-geolocation-service';
+import axios from 'axios';
 
 type LoginProps = {
   navigation: any;
   route: any;
 };
 
+type UserType = 'customer' | 'tailor';
+type AuthProvider = 'google' | 'apple';
+
 const Login = ({navigation, route}: LoginProps) => {
-  const {userType} = route.params as {userType: 'Customer' | 'Tailor'};
-  const [details, setDetails] = React.useState({
-    email: '',
-    password: '',
+  const {userType} = route.params as {userType: UserType};
+  const [isLoading, setIsLoading] = useState(false);
+  const currentLocationRef = useRef({
+    latitude: 0,
+    longitude: 0,
+    address: '',
   });
-  const [isLoading, setIsLoading] = React.useState(false);
 
-  const handleChange = (key: string, value: string) => {
-    setDetails({...details, [key]: value});
-  };
+  const {setUser} = useContext(userContext);
 
-  const handleLoginWithOAuth = async (provider: 'google' | 'apple') => {
+  const handleLoginWithOAuth = async (provider: AuthProvider) => {
     try {
+      if (
+        currentLocationRef.current.latitude === 0 ||
+        currentLocationRef.current.longitude === 0
+      ) {
+        Alert.alert('Error', 'Please enable location permission to continue');
+        return;
+      }
+
+      setIsLoading(true);
       let result = null;
       if (provider === 'google') {
         await GoogleSignin.hasPlayServices({
           showPlayServicesUpdateDialog: true,
         });
+
         const {idToken} = await GoogleSignin.signIn();
 
         // Create a Google credential with the token
@@ -48,11 +68,13 @@ const Login = ({navigation, route}: LoginProps) => {
       }
 
       if (!result) {
-        console.log('Result is null');
+        Alert.alert('Error', 'Something went wrong');
+        setIsLoading(false);
         return;
       }
 
       if (result.user) {
+        // if we have a user
         const {user} = result;
 
         const userDoc = await firestore()
@@ -60,21 +82,39 @@ const Login = ({navigation, route}: LoginProps) => {
           .doc(user?.uid)
           .get();
 
+        console.log('currentLocation', currentLocationRef.current);
+
         if (userDoc.exists) {
-          // we found the user in the database , check for the role of user , he is customer or tailor
+          // we found the user in the database
           const userData = userDoc.data();
 
           if (userData?.role !== userType) {
-            console.log('User is not a', userType);
+            setIsLoading(false);
+            Alert.alert(
+              'Error',
+              `You are not a ${userType}, please login with the correct account`,
+            );
             return;
           }
 
-          navigation.navigate(ScreenNames.Home, {userType});
+          setUser({
+            name: user?.displayName,
+            email: user?.email,
+            id: user?.uid,
+            role: userData?.role,
+            currentLocation: userData?.currentLocation,
+          });
+
+          setIsLoading(false);
+          navigation.navigate(ScreenNames.CustomerNav, {userType});
         } else {
           // we do not have a user , so we need to create a user
           const newUser = {
+            name: user?.displayName,
             email: user?.email,
+            id: user?.uid,
             role: userType,
+            currentLocation: currentLocationRef.current,
           };
 
           await firestore()
@@ -82,73 +122,81 @@ const Login = ({navigation, route}: LoginProps) => {
             .doc(user?.uid)
             .set(newUser);
 
+          setUser(newUser);
+          setIsLoading(false);
           navigation.navigate(ScreenNames.CustomerNav, {userType});
         }
       }
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
-
-  const handleLogin = async () => {
-    try {
-      setIsLoading(true);
-
-      if (!details.email.includes('@')) {
-        console.log('Invalid email');
-        return;
-      }
-
-      if (details.password.length < 6) {
-        console.log('Password must be atleast 6 characters long');
-        return;
-      }
-
-      const result = await auth().signInWithEmailAndPassword(
-        details.email,
-        details.password,
-      );
-
-      const {user} = result;
-
-      const userDoc = await firestore()
-        .collection(CollectionNames.Users)
-        .doc(user?.uid)
-        .get();
-
-      if (userDoc.exists) {
-        // we found the user in the database , check for the role of user , he is customer or tailor
-        const userData = userDoc.data();
-
-        if (userData?.role !== userType) {
-          console.log('User is not a', userType);
-          return;
-        }
-
-        navigation.navigate(ScreenNames.Home, {userType});
-      } else {
-        console.log('User not found in the database');
-      }
     } catch (error: any) {
-      if (error.code === 'auth/user-not-found') {
-        console.log('User not found');
-      } else if (error.code === 'auth/wrong-password') {
-        console.log('Wrong password');
-      } else if (error.code === 'auth/invalid-email') {
-        console.log('Invalid email');
-      } else if (error.code === 'auth/too-many-requests') {
-        console.log('Too many requests');
-      } else if (error.code === 'auth/network-request-failed') {
-        console.log('Network request failed');
-      } else {
-        console.log('Error:', error);
-      }
+      setIsLoading(false);
+      Alert.alert('Error', error.message);
     }
   };
 
-  const handleRegister = () => {
-    navigation.navigate(ScreenNames.Register, {userType});
+  const fetchLocation = async () => {
+    let isPermssionGranted = false;
+    if (Platform.OS === 'ios') {
+      const locationResponse = await Geolocation.requestAuthorization(
+        'whenInUse',
+      );
+      isPermssionGranted = locationResponse === 'granted';
+    } else if (Platform.OS === 'android') {
+      const permissionsToAsk =
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION;
+
+      const granted = await PermissionsAndroid.request(permissionsToAsk, {
+        title: 'Location Permission',
+        message: 'We need your location to show you the best tailors near you',
+        buttonNeutral: 'Ask Me Later',
+        buttonNegative: 'Cancel',
+        buttonPositive: 'OK',
+      });
+      isPermssionGranted = granted === PermissionsAndroid.RESULTS.GRANTED;
+    }
+
+    if (!isPermssionGranted) {
+      Alert.alert(
+        'Permission Denied',
+        'Please enable location permission to continue',
+      );
+      return;
+    }
+
+    Geolocation.getCurrentPosition(
+      async position => {
+        const {latitude, longitude} = position.coords;
+        // sending an api request to get the address to the google api and get the address
+        const response = await axios.get(
+          'https://maps.googleapis.com/maps/api/geocode/json',
+          {
+            params: {
+              latlng: `${latitude},${longitude}`,
+              key: 'AIzaSyCUA3uUquQ88On7YaIFbBpByARvNj64GAU',
+            },
+          },
+        );
+
+        currentLocationRef.current = {
+          latitude,
+          longitude,
+          address: response.data.results[0].formatted_address,
+        };
+      },
+      error => {
+        console.log('Error fetching location', error);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 10000,
+        showLocationDialog: true,
+      },
+    );
   };
+
+  useEffect(() => {
+    fetchLocation();
+  }, []);
 
   if (isLoading) {
     return <Loader />;
@@ -158,19 +206,6 @@ const Login = ({navigation, route}: LoginProps) => {
     <View style={styles.mainContainer}>
       <View style={styles.container}>
         <Icon name="facebook" size={100} color={Colors.Primary} />
-        <Input
-          placeholder="Enter Email"
-          onChange={text => handleChange('email', text)}
-          keyBoardType="email-address"
-          isError={details.email.length > 0 && !details.email.includes('@')}
-        />
-        <Input
-          placeholder="Enter Password.. "
-          isPassword
-          onChange={text => handleChange('password', text)}
-          isError={details.password.length > 0 && details.password.length < 6}
-        />
-        <Button title="Login" icon="login" onPress={handleLogin} />
         {Platform.OS === 'android' && (
           <Button
             title="Continue With Google"
@@ -185,7 +220,6 @@ const Login = ({navigation, route}: LoginProps) => {
             onPress={(_: any) => handleLoginWithOAuth('apple')}
           />
         )}
-        <Button title="Register" icon="account-plus" onPress={handleRegister} />
       </View>
     </View>
   );
