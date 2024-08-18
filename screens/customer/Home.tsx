@@ -1,6 +1,6 @@
 import {Dimensions, ScrollView, StyleSheet, Text, View} from 'react-native';
 import React, {useContext, useEffect, useState} from 'react';
-import {CollectionNames, Colors} from '../../lib/constants';
+import {CollectionNames, Colors, Roles} from '../../lib/constants';
 import MapView, {Marker} from 'react-native-maps';
 import {
   calculateRegion,
@@ -61,13 +61,24 @@ const CustomerHome = ({navigation}: any) => {
   });
   const [radius, setRadius] = useState(radiuses[0]);
 
+  const nearbyFilter = (tailor: any) => {
+    return (
+      Math.abs(tailor.latitude - currentLocation.latitude) <= 0.1 &&
+      Math.abs(tailor.longitude - currentLocation.longitude) <= 0.1
+    );
+  };
+
   const calcuateNearByTailors = async () => {
     try {
-      const tailors = await firestore().collection(CollectionNames.Users).get();
+      const tailors = await firestore()
+        .collection(CollectionNames.Users)
+        .where('role', '==', Roles.Tailor)
+        .get();
 
       const tailorsData = tailors.docs
         .map(doc => doc.data())
-        .map(data => data.currentLocation);
+        .map(data => data.currentLocation)
+        .filter(nearbyFilter);
 
       return tailorsData;
     } catch (error) {
@@ -116,11 +127,12 @@ const CustomerHome = ({navigation}: any) => {
       </MapView>
       <View style={styles.bottomContainer}>
         <View style={styles.radiusContainer}>
-          {radiuses.map((radius, index) => (
+          {radiuses.map((sRadius, index) => (
             <SmallCard
-              title={`${radius} km`}
+              title={`${sRadius} km`}
+              selected={sRadius === radius}
               key={index}
-              onPress={() => setRadius(radius)}
+              onPress={() => setRadius(sRadius)}
             />
           ))}
         </View>

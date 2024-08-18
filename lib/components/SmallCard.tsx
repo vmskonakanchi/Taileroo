@@ -10,13 +10,21 @@ type SmallCardProps = {
   key?: string | number;
   height?: number | string;
   width?: number | string;
+  selected?: boolean;
 };
 
 const SmallCard = (props: SmallCardProps) => {
-  const {title, onPress} = props;
+  const {title, onPress, selected} = props;
+
   return (
     <TouchableHighlight
-      style={styles.container}
+      style={[
+        styles.container,
+        {
+          // borderColor: selected ? Colors.Secondary : Colors.Primary,
+          borderWidth: selected ? 3 : 0.2,
+        },
+      ]}
       onPress={onPress}
       underlayColor={Colors.White}>
       <Text style={styles.text}>{title}</Text>
@@ -25,15 +33,16 @@ const SmallCard = (props: SmallCardProps) => {
 };
 
 export default SmallCard;
+const perfectHW = 75;
 
 const styles = StyleSheet.create({
   container: {
-    height: SCREEN_HEIGHT * 0.1,
-    width: SCREEN_WIDTH * 0.2,
+    height: perfectHW,
+    width: perfectHW,
     backgroundColor: Colors.Primary,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: Math.round(SCREEN_WIDTH + SCREEN_HEIGHT) / 2,
+    borderRadius: perfectHW / 2,
     borderWidth: 2,
     borderColor: Colors.White,
     elevation: 10,

@@ -32,14 +32,17 @@ const SelectCard = (props: SelectCardProps) => {
 
 export default SelectCard;
 
+// const perfectHW = SCREEN_WIDTH * 0.7;
+const perfectHW = 250;
+
 const styles = StyleSheet.create({
   container: {
-    height: SCREEN_HEIGHT * 0.3,
-    width: SCREEN_WIDTH * 0.6,
+    height: perfectHW,
+    width: perfectHW,
     backgroundColor: Colors.Primary,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: Math.round(SCREEN_WIDTH + SCREEN_HEIGHT) / 2,
+    borderRadius: perfectHW / 2,
     borderWidth: 2,
     borderColor: Colors.White,
     elevation: 10,
