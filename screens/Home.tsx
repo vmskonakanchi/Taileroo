@@ -27,6 +27,11 @@ const Home = ({navigation}: HomeProps) => {
     setIsLoading(true);
     const user = auth().currentUser;
 
+    if (!user) {
+      setIsLoading(false);
+      return;
+    }
+
     firestore()
       .collection(CollectionNames.Users)
       .doc(user?.uid)

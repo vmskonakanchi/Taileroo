@@ -103,6 +103,7 @@ const Login = ({navigation, route}: LoginProps) => {
             id: user?.uid,
             role: userData?.role,
             currentLocation: userData?.currentLocation,
+            photoURL: userData?.photoURL,
           });
 
           setIsLoading(false);
@@ -115,6 +116,7 @@ const Login = ({navigation, route}: LoginProps) => {
             id: user?.uid,
             role: userType,
             currentLocation: currentLocationRef.current,
+            photoURL: user?.photoURL,
           };
 
           await firestore()

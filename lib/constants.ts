@@ -3,9 +3,11 @@ export const ScreenNames = {
   Login: 'Login',
   Register: 'Register',
   CustomerHome: 'CustomerHome',
+  CustomerMap: 'CustomerMap',
   CustomerNav: 'CustomerNav',
   TailorNav: 'TailorNav',
   TailorHome: 'TailorHome',
+  Customer_Profile: 'Customer Profile',
 };
 
 export const CollectionNames = {

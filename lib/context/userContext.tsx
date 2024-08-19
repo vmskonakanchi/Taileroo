@@ -4,14 +4,19 @@ import firestore from '@react-native-firebase/firestore';
 import {CollectionNames} from '../constants';
 
 const defaultUser = {
-  email: '',
   id: '',
+  name: '',
+  email: '',
+  phone: '',
+  photoURL: '',
+  role: '',
   currentLocation: {
     latitude: 0,
     longitude: 0,
     address: '',
   },
 };
+
 export const userContext = createContext<any>(defaultUser);
 
 const AuthContext = (props: React.PropsWithChildren) => {
@@ -31,19 +36,27 @@ const AuthContext = (props: React.PropsWithChildren) => {
 
           setUser({
             email: user.email,
+            name: user.displayName,
+            phone: '',
             id: user.uid,
             currentLocation: userData?.currentLocation,
+            photoURL: userData?.photoURL,
+            role: userData?.role,
           });
         }
       } else {
         setUser({
-          email: '',
           id: '',
+          role: '',
+          name: '',
+          phone: '',
+          email: '',
           currentLocation: {
             latitude: 0,
             longitude: 0,
             address: '',
           },
+          photoURL: '',
         });
       }
     } catch (error) {

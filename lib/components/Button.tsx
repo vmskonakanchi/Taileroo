@@ -1,4 +1,10 @@
-import {StyleSheet, TouchableHighlight, Text, View} from 'react-native';
+import {
+  StyleSheet,
+  TouchableHighlight,
+  Text,
+  View,
+  DimensionValue,
+} from 'react-native';
 import React from 'react';
 import {Colors} from '../constants';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -8,14 +14,32 @@ type InputProps = {
   onPress?: any; // this will be callback function
   icon?: string;
   reverse?: boolean;
+  paddingHorizontal?: number;
+  marginHorizontal?: number;
+  width?: DimensionValue;
 };
 
 const Button = (props: InputProps) => {
-  const {title, onPress, icon, reverse} = props;
+  const {
+    title,
+    onPress,
+    icon,
+    reverse,
+    paddingHorizontal,
+    marginHorizontal,
+    width,
+  } = props;
 
   return (
     <TouchableHighlight
-      style={styles.button}
+      style={[
+        styles.button,
+        {
+          paddingHorizontal,
+          marginHorizontal,
+          width: width || '100%',
+        },
+      ]}
       onPress={onPress}
       underlayColor={Colors.White}>
       <View style={styles.innerContainer}>

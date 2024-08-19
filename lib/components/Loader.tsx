@@ -36,6 +36,7 @@ const styles = StyleSheet.create({
   },
   loaderText: {
     color: Colors.Primary,
+    maxWidth: '80%',
     fontSize: 20,
     marginTop: 20,
   },
