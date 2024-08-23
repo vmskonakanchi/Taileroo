@@ -8,10 +8,14 @@ export const ScreenNames = {
   TailorNav: 'TailorNav',
   TailorHome: 'TailorHome',
   Customer_Profile: 'Customer Profile',
+  TailorProfileView: 'TailorProfileView',
+  TailorModalNav: 'TailorModalNav',
+  Root: 'Root',
 };
 
 export const CollectionNames = {
   Users: 'users',
+  TailorViews: 'tailorViews',
 };
 
 export const Roles = {

@@ -2,6 +2,7 @@ import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Colors, ScreenNames} from '../lib/constants';
 import Home from '../screens/customer/Home';
+import TailorProfile from '../screens/tailor/Profile';
 import Profile from '../screens/customer/Profile';
 import Map from '../screens/customer/Map';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
