@@ -58,7 +58,7 @@ const RootNavigator = () => {
         <Stack.Screen
           name={ScreenNames.TailorProfileView}
           component={TailorProfile}
-          // options={{headerShown: false}}
+          options={{headerShown: false}}
         />
       </Stack.Group>
     </Stack.Navigator>

@@ -23,26 +23,31 @@ const nearByTailors = [
     name: 'Tailor 1',
     lat: 13.624383,
     lng: 79.4077179,
+    photoURL: 'https://via.placeholder.com/200',
   },
   {
     name: 'Tailor 2',
     lat: 13.624383,
     lng: 79.4077179,
+    photoURL: 'https://via.placeholder.com/200',
   },
   {
     name: 'Tailor 3',
     lat: 13.624383,
     lng: 79.4077179,
+    photoURL: 'https://via.placeholder.com/200',
   },
   {
     name: 'Tailor 4',
     lat: 13.624383,
     lng: 79.4077179,
+    photoURL: 'https://via.placeholder.com/200',
   },
   {
     name: 'Tailor 5',
     lat: 13.624383,
     lng: 79.4077179,
+    photoURL: 'https://via.placeholder.com/200',
   },
 ];
 
@@ -106,7 +111,7 @@ const CustomerHome = ({navigation}: any) => {
 
   if (isLoading) {
     return (
-      <Loader message="Please wait while we get the best talors near you" />
+      <Loader message="Please wait while we get the best tailors near you" />
     );
   }
 
@@ -122,7 +127,7 @@ const CustomerHome = ({navigation}: any) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <MapView style={styles.map} region={region}>
+      <MapView style={styles.map} region={region} provider="google">
         {nearByTailors.map((tailor, index) => (
           <Marker
             key={index}
@@ -134,6 +139,10 @@ const CustomerHome = ({navigation}: any) => {
             onPress={() => {
               console.log('Marker Pressed');
             }}
+            onTouchStart={() => console.log('Pointer Enter')}
+            onTouchEnd={() => console.log('Pointer Leave')}
+            onDragStart={() => console.log('Drag Start')}
+            icon={{uri: tailor?.photoURL}}
           />
         ))}
       </MapView>

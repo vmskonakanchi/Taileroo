@@ -65,3 +65,24 @@ export function calculateRegion(nearbyTailors: any[], radius: number = 1) {
 
   return region;
 }
+
+const deg2rad = (deg: number) => deg * (Math.PI / 180);
+
+type LatLng = {lat: number; lng: number};
+
+export function calculateDistance(srcLatLng: LatLng, destLatLng: LatLng) {
+  const R = 6371; // Radius of the earth in km
+  const dLat = deg2rad(destLatLng.lat - srcLatLng.lat); // deg2rad below
+  const dLng = deg2rad(destLatLng.lng - srcLatLng.lng);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(deg2rad(srcLatLng.lat)) *
+      Math.cos(deg2rad(destLatLng.lat)) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  // Distance in km
+  const distance = R * c;
+  return distance;
+}

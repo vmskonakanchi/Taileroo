@@ -1,16 +1,13 @@
 import {
-  Dimensions,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
-  Touchable,
   TouchableHighlight,
   View,
 } from 'react-native';
 import React, {useContext, useEffect, useState} from 'react';
 import {CollectionNames, Colors, Roles, ScreenNames} from '../../lib/constants';
-import MapView, {Marker} from 'react-native-maps';
-import SmallCard from '../../lib/components/SmallCard';
 import {userContext} from '../../lib/context/userContext';
 import firestore from '@react-native-firebase/firestore';
 import Loader from '../../lib/components/Loader';
@@ -34,15 +31,27 @@ const CustomerHome = ({navigation}: any) => {
     return (
       <TouchableHighlight
         style={styles.singleTailorCard}
+        underlayColor={Colors.Primary}
         onPress={() => {
           navigation.popToTop();
           navigation.navigate(ScreenNames.TailorProfileView, {tailor});
         }}>
-        <>
-          <Text style={styles.singleTailorCardBiggerText}>{tailor.name}</Text>
-          <Text style={styles.singleTailorText}>{tailor.email}</Text>
-          <Text style={styles.singleTailorText}>{tailor.distance} KM Away</Text>
-        </>
+        <View style={{flexDirection: 'row', justifyContent: 'space-around'}}>
+          <Image
+            alt={`Profile Picture of ` + tailor.name}
+            source={{
+              uri: tailor?.photoURL || 'https://via.placeholder.com/200',
+            }}
+            style={styles.roundedImage}
+          />
+          <View style={styles.innserSingleTailorCard}>
+            <Text style={styles.singleTailorCardBiggerText}>{tailor.name}</Text>
+            <Text style={styles.singleTailorText}>{tailor.email}</Text>
+            <Text style={styles.singleTailorText}>
+              {tailor.distance} KM Away
+            </Text>
+          </View>
+        </View>
       </TouchableHighlight>
     );
   };
@@ -83,14 +92,16 @@ const CustomerHome = ({navigation}: any) => {
         },
       ];
 
+      setIsLoading(false);
       setTailors(fakeSnapshot);
+      return;
 
-      // if (snapshot.empty) {
-      //   // if no recent tailor views
-      //   setIsLoading(false);
-      //   return;
-      // }
-      // setTailors(snapshot.docs.map(doc => doc.data()));
+      if (snapshot.empty) {
+        // if no recent tailor views
+        setIsLoading(false);
+        return;
+      }
+      setTailors(snapshot.docs.map(doc => doc.data()));
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
@@ -148,6 +159,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     margin: 10,
   },
+  innserSingleTailorCard: {
+    backgroundColor: Colors.White,
+  },
   singleTailorCard: {
     margin: 10,
     backgroundColor: Colors.White,
@@ -162,5 +176,10 @@ const styles = StyleSheet.create({
     color: Colors.Primary,
     fontSize: 20,
     fontWeight: 'bold',
+  },
+  roundedImage: {
+    height: 100,
+    width: 100,
+    borderRadius: 50,
   },
 });
