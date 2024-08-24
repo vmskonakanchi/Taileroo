@@ -1,6 +1,5 @@
 import {Image, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
-import Button from '../../lib/components/Button';
 import {Colors} from '../../lib/constants';
 
 const Profile = ({route}: any) => {

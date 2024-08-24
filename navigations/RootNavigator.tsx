@@ -52,15 +52,6 @@ const RootNavigator = () => {
           options={{headerShown: false}}
         />
       )}
-
-      {/*  Tailor profile view modal */}
-      <Stack.Group screenOptions={{presentation: 'modal'}}>
-        <Stack.Screen
-          name={ScreenNames.TailorProfileView}
-          component={TailorProfile}
-          options={{headerShown: false}}
-        />
-      </Stack.Group>
     </Stack.Navigator>
   );
 };

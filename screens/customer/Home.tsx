@@ -33,8 +33,9 @@ const CustomerHome = ({navigation}: any) => {
         style={styles.singleTailorCard}
         underlayColor={Colors.Primary}
         onPress={() => {
-          navigation.popToTop();
-          navigation.navigate(ScreenNames.TailorProfileView, {tailor});
+          navigation.navigate(ScreenNames.TailorProfileView, {
+            tailor,
+          });
         }}>
         <View style={{flexDirection: 'row', justifyContent: 'space-around'}}>
           <Image
